@@ -13,11 +13,11 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * Created by nikunj on 8/28/14.
+ * Created by nikunj on 8/29/14.
  */
-public class TestDbClass extends AndroidTestCase {
+public class TestProvider extends AndroidTestCase {
 
-    public static final String LOG_TAG = TestDbClass.class.getSimpleName();
+    public static final String LOG_TAG = TestProvider.class.getSimpleName();
     public String CITY_NAME = "North Pole";
 
     ContentValues getLocationContentValues(){
@@ -64,7 +64,7 @@ public class TestDbClass extends AndroidTestCase {
             int idx = cursor.getColumnIndex(columnName);
             assertFalse(idx == -1);
             String expectedValue = entry.getValue().toString();
-            Log.i(LOG_TAG, "VALUE : Expected == Actual ===> Result : " + expectedValue + "  ==  " + cursor.getString(idx) + " ===> "   + expectedValue.equals(cursor.getString(idx)));
+            Log.i(LOG_TAG, "VALUE : Expected == Actual ===> Result : " + expectedValue + "  ==  " + cursor.getString(idx) + " ===> " + expectedValue.equals(cursor.getString(idx)));
             assertEquals(expectedValue, cursor.getString(idx));
         }
     }
@@ -97,11 +97,28 @@ public class TestDbClass extends AndroidTestCase {
         return columns;
     }
 
-    public void testCreateDb() throws Throwable {
+    public void testDeleteDb() throws Throwable {
         mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
-        SQLiteDatabase database = new WeatherDbHelper(this.mContext).getWritableDatabase();
-        assertEquals(true, database.isOpen());
-        database.close();
+    }
+
+    public void testGetType(){
+        String type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.CONTENT_URI);
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
+
+        String testLocation = "94074";
+        type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.buildWeatherLocation(testLocation));
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
+
+        String testDate = "20140829";
+        type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(testLocation,testDate));
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE, type);
+
+        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.CONTENT_URI);
+        assertEquals(WeatherContract.LocationEntry.CONTENT_TYPE, type);
+
+        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.buildLocationUri(1L));
+        assertEquals(WeatherContract.LocationEntry.CONTENT_ITEM_TYPE, type);
+
     }
 
     public void testInsertReadDb() {
@@ -170,24 +187,5 @@ public class TestDbClass extends AndroidTestCase {
         int index = cursor.getColumnIndex(column);
         return cursor.getLong(index);
     }
+
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
