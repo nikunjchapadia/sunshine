@@ -34,6 +34,11 @@
                 android:name="android:support.PARENT_ACTIVITY"
                 android:value="MyActivity"/>
         </activity>
+
+        <!--Add content provider -->
+        <provider
+            android:authorities="com.wiwly.sunshine"
+            android:name=".data.WeatherProvider" />
     </application>
 
 </manifest>
