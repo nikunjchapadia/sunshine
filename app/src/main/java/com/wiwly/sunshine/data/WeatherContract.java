@@ -9,6 +9,8 @@ import android.provider.BaseColumns;
  */
 public class WeatherContract {
 
+    private final String LOG_TAG = WeatherContract.class.getSimpleName();
+
     public static final String CONTENT_AUTHORITY = "com.wiwly.sunshine";
     public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 

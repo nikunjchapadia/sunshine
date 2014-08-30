@@ -1,8 +1,9 @@
 package com.wiwly.sunshine;
 
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
@@ -19,6 +20,159 @@ public class TestProvider extends AndroidTestCase {
 
     public static final String LOG_TAG = TestProvider.class.getSimpleName();
     public String CITY_NAME = "North Pole";
+    public String TEST_DATE = "20140829";
+
+    public void testDeleteDb() throws Throwable {
+        mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
+    }
+
+    public void testGetType(){
+        //String type = null;
+        String type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.CONTENT_URI);
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
+
+        String testLocation = "94074";
+        type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.buildWeatherLocation(testLocation));
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
+
+        String testDate = "20140829";
+        type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(testLocation,testDate));
+        assertEquals(WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE, type);
+
+//        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.CONTENT_URI);
+//        assertEquals(WeatherContract.LocationEntry.CONTENT_TYPE, type);
+
+        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.buildLocationUri(1L));
+        assertEquals(WeatherContract.LocationEntry.CONTENT_ITEM_TYPE, type);
+
+    }
+
+    public void testInsertReadProvider() {
+
+        ContentValues values = getLocationContentValues();
+        Uri insertLocationUri = mContext.getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI,values);
+        long locationRowId = ContentUris.parseId(insertLocationUri);
+        assertTrue(locationRowId != -1);
+        Log.d(LOG_TAG, "New Row ID : " + locationRowId);
+
+        ContentValues values1 = new ContentValues(values);
+        values1.put(WeatherContract.LocationEntry._ID, locationRowId);
+        values1.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, "Santa's Village");
+        int count = mContext.getContentResolver().update(
+                WeatherContract.WeatherEntry.CONTENT_URI,
+                values1,
+                WeatherContract.LocationEntry.COLUMN_CITY_NAME,
+                new String[]{Long.toString(locationRowId)});
+        assertEquals(count,1);
+
+        // cursor primary interface to query results
+        Cursor cursor = mContext.getContentResolver().query(
+                WeatherContract.LocationEntry.CONTENT_URI,
+                null,  //columns,
+                null,
+                null,
+                null
+        );
+
+        if (cursor.moveToFirst()) {
+            validateCursor(values, cursor);
+
+            ContentValues weatherValues = getWeatherContentValues(locationRowId);
+            Uri insertUri = mContext.getContentResolver().insert(WeatherContract.WeatherEntry.CONTENT_URI, weatherValues);
+            long weatherRowId = ContentUris.parseId(insertUri);
+            //long weatherRowId = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, weatherValues);
+            Log.d(LOG_TAG, weatherRowId + "");
+            assertTrue(weatherRowId != -1);
+
+            Cursor weatherCursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI,
+                    null,  //weatherColumns,
+                    null,
+                    null,
+                    null
+            );
+            if (weatherCursor.moveToFirst()) {
+                validateCursor(weatherValues, weatherCursor);
+
+            } else {
+                fail("No values returned");
+            }
+            weatherCursor.close();
+
+            weatherCursor = mContext.getContentResolver().query(
+                    WeatherContract.WeatherEntry.buildWeatherLocation(CITY_NAME),
+                    null, // leaving "columns" null just returns all the columns.
+                    null, // cols for "where" clause
+                    null, // values for "where" clause
+                    null  // sort order
+            );
+            weatherCursor.close();
+
+            weatherCursor = mContext.getContentResolver().query(
+                    WeatherContract.WeatherEntry.buildWeatherLocationWithStartDate(CITY_NAME, TEST_DATE),
+                    null, // leaving "columns" null just returns all the columns.
+                    null, // cols for "where" clause
+                    null, // values for "where" clause
+                    null  // sort order
+            );
+            weatherCursor.close();
+
+            weatherCursor = mContext.getContentResolver().query(
+                    WeatherContract.WeatherEntry.buildWeatherLocationWithDate(CITY_NAME, TEST_DATE),
+                    null, // leaving "columns" null just returns all the columns.
+                    null, // cols for "where" clause
+                    null, // values for "where" clause
+                    null  // sort order
+            );
+            weatherCursor.close();
+
+            Cursor locationCursor = mContext.getContentResolver().query(
+                    WeatherContract.LocationEntry.buildLocationUri(locationRowId),
+                    null, // leaving "columns" null just returns all the columns.
+                    null, // cols for "where" clause
+                    null, // values for "where" clause
+                    null  // sort order
+            );
+
+        } else {
+            fail(" No values returned");
+        }
+    }
+
+    public void testDeleteAllRecords(){
+        // delete all records
+        mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
+        mContext.getContentResolver().delete(WeatherContract.LocationEntry.CONTENT_URI, null, null);
+
+        // make sure we deleted all records
+        Cursor cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);
+        assertEquals(cursor.getCount(), 0);
+        cursor.close();
+
+        cursor = mContext.getContentResolver().query(WeatherContract.LocationEntry.CONTENT_URI, null, null, null, null);
+        assertEquals(cursor.getCount(), 0);
+        cursor.close();
+
+    }
+
+    public String getString(Cursor cursor, String column) {
+        int index = cursor.getColumnIndex(column);
+        return cursor.getString(index);
+    }
+
+    public double getDouble(Cursor cursor, String column) {
+        int index = cursor.getColumnIndex(column);
+        return cursor.getDouble(index);
+    }
+
+    public double getInt(Cursor cursor, String column) {
+        int index = cursor.getColumnIndex(column);
+        return cursor.getInt(index);
+    }
+
+    public long getLong(Cursor cursor, String column) {
+        int index = cursor.getColumnIndex(column);
+        return cursor.getLong(index);
+    }
 
     ContentValues getLocationContentValues(){
         String locationSetting = "99705";
@@ -95,97 +249,6 @@ public class TestProvider extends AndroidTestCase {
                 WeatherContract.WeatherEntry.COLUMN_WEATHER_ID,
         };
         return columns;
-    }
-
-    public void testDeleteDb() throws Throwable {
-        mContext.deleteDatabase(WeatherDbHelper.DATABASE_NAME);
-    }
-
-    public void testGetType(){
-        String type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.CONTENT_URI);
-        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
-
-        String testLocation = "94074";
-        type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.buildWeatherLocation(testLocation));
-        assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
-
-        String testDate = "20140829";
-        type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(testLocation,testDate));
-        assertEquals(WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE, type);
-
-        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.CONTENT_URI);
-        assertEquals(WeatherContract.LocationEntry.CONTENT_TYPE, type);
-
-        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.buildLocationUri(1L));
-        assertEquals(WeatherContract.LocationEntry.CONTENT_ITEM_TYPE, type);
-
-    }
-
-    public void testInsertReadDb() {
-        WeatherDbHelper dbHelper = new WeatherDbHelper(mContext);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
-        ContentValues values = getLocationContentValues();
-        long locationRowId = db.insert(WeatherContract.LocationEntry.TABLE_NAME, null, values);
-        assertTrue(locationRowId != -1);
-        Log.d(LOG_TAG, "New Row ID : " + locationRowId);
-
-        // cursor primary interface to query results
-        Cursor cursor = db.query(
-                WeatherContract.LocationEntry.TABLE_NAME,
-                null,  //columns,
-                null,
-                null,
-                null,
-                null,
-                null
-        );
-
-        if (cursor.moveToFirst()) {
-            validateCursor(values, cursor);
-
-            ContentValues weatherValues = getWeatherContentValues(locationRowId);
-            long weatherRowId = db.insert(WeatherContract.WeatherEntry.TABLE_NAME, null, weatherValues);
-            Log.d(LOG_TAG, weatherRowId + "");
-            assertTrue(weatherRowId != -1);
-
-            Cursor weatherCursor = db.query(
-                    WeatherContract.WeatherEntry.TABLE_NAME,
-                    null,  //weatherColumns,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null);
-            if (weatherCursor.moveToFirst()) {
-                validateCursor(weatherValues, weatherCursor);
-
-            } else {
-                fail("No values returned");
-            }
-        } else {
-            fail(" No values returned");
-        }
-    }
-
-    public String getString(Cursor cursor, String column) {
-        int index = cursor.getColumnIndex(column);
-        return cursor.getString(index);
-    }
-
-    public double getDouble(Cursor cursor, String column) {
-        int index = cursor.getColumnIndex(column);
-        return cursor.getDouble(index);
-    }
-
-    public double getInt(Cursor cursor, String column) {
-        int index = cursor.getColumnIndex(column);
-        return cursor.getInt(index);
-    }
-
-    public long getLong(Cursor cursor, String column) {
-        int index = cursor.getColumnIndex(column);
-        return cursor.getLong(index);
     }
 
 }
