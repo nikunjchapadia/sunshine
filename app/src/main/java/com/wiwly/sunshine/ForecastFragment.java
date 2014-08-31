@@ -165,7 +165,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onStart(){
         super.onStart();
-        updateWeather();
+        //updateWeather();
     }
 
     // Loader cursor - to inform UI about any changes in db via content provider
@@ -210,6 +210,16 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         mForecastAdapter.swapCursor(null);
     }
 
+    //check to see if the preference changed when the activity resumes, and if so, restart the loader:
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
+            getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+        }
+    }
+
+
 //    public class FetchWeatherTask extends AsyncTask<String, Void, String[]> {
 //
 //        private final String LOG_TAG = FetchWeatherTask.class.getSimpleName();
@@ -224,6 +234,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //                    mForecastAdapter.add(str);
 //                }
 //            }
+
 //            super.onPostExecute(strings);
 //        }
 //
