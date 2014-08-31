@@ -145,17 +145,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 SimpleCursorAdapter adapter = (SimpleCursorAdapter) parent.getAdapter();
                 Cursor cursor = adapter.getCursor();
                 if(null != cursor && cursor.moveToPosition(position)){
-                    boolean isMetric = Utility.isMetric(getActivity());
-                    String forecast = String.format("%s - %s - %s/%s",
-                            Utility.formatDate(cursor.getString(COL_WEATHER_DATE)),
-                            cursor.getString(COL_WEATHER_DESC),
-                            Utility.formatTemperature(cursor.getDouble(COL_WEATHER_MAX_TEMP), isMetric),
-                            Utility.formatTemperature(cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric));
+//                    boolean isMetric = Utility.isMetric(getActivity());
+//                    String forecast = String.format("%s - %s - %s/%s",
+//                            Utility.formatDate(cursor.getString(COL_WEATHER_DATE)),
+//                            cursor.getString(COL_WEATHER_DESC),
+//                            Utility.formatTemperature(cursor.getDouble(COL_WEATHER_MAX_TEMP), isMetric),
+//                            Utility.formatTemperature(cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric));
                     //Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
+                    //Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
+                    Intent intent = new Intent(getActivity(), DetailActivity.class)
+                            .putExtra(DetailActivity.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
                     startActivity(intent);
                 }
-
             }
         });
 
