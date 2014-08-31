@@ -27,8 +27,13 @@ public class TestProvider extends AndroidTestCase {
     }
 
     public void testGetType(){
+        String type;
+
+        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.CONTENT_URI);
+        assertEquals(WeatherContract.LocationEntry.CONTENT_TYPE, type);
+
         //String type = null;
-        String type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.CONTENT_URI);
+        type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.CONTENT_URI);
         assertEquals(WeatherContract.WeatherEntry.CONTENT_TYPE, type);
 
         String testLocation = "94074";
@@ -39,8 +44,6 @@ public class TestProvider extends AndroidTestCase {
         type = mContext.getContentResolver().getType(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(testLocation,testDate));
         assertEquals(WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE, type);
 
-//        type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.CONTENT_URI);
-//        assertEquals(WeatherContract.LocationEntry.CONTENT_TYPE, type);
 
         type = mContext.getContentResolver().getType(WeatherContract.LocationEntry.buildLocationUri(1L));
         assertEquals(WeatherContract.LocationEntry.CONTENT_ITEM_TYPE, type);
@@ -140,8 +143,8 @@ public class TestProvider extends AndroidTestCase {
 
     public void testDeleteAllRecords(){
         // delete all records
-        mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
-        mContext.getContentResolver().delete(WeatherContract.LocationEntry.CONTENT_URI, null, null);
+//        mContext.getContentResolver().delete(WeatherContract.WeatherEntry.CONTENT_URI, null, null);
+//        mContext.getContentResolver().delete(WeatherContract.LocationEntry.CONTENT_URI, null, null);
 
         // make sure we deleted all records
         Cursor cursor = mContext.getContentResolver().query(WeatherContract.WeatherEntry.CONTENT_URI, null, null, null, null);

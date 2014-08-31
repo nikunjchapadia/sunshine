@@ -3,15 +3,17 @@ package com.wiwly.sunshine.data;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 /**
  * Created by nikunj on 8/28/14.
  */
 public class WeatherDbHelper extends SQLiteOpenHelper {
 
+    public static final String LOG_TAG = WeatherDbHelper.class.getSimpleName();
+
     // If you change the database schema, you must increment the database version.
     private static final int DATABASE_VERSION = 1;
-
     public static final String DATABASE_NAME = "weather.db";
 
     public WeatherDbHelper(Context context) {
@@ -20,10 +22,6 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        // Create a table to hold locations.  A location consists of the string supplied in the
-        // location setting, the city name, and the latitude and longitude
-
-        // TBD
         final String SQL_CREATE_LOCATION_TABLE =
                 "CREATE TABLE " + WeatherContract.LocationEntry.TABLE_NAME + " (" +
                         WeatherContract.LocationEntry._ID + " INTEGER PRIMARY KEY, " +
@@ -65,12 +63,16 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 " UNIQUE (" + WeatherContract.WeatherEntry.COLUMN_DATETEXT + ", " +
                 WeatherContract.WeatherEntry.COLUMN_LOC_KEY + ") ON CONFLICT REPLACE);";
 
+
         sqLiteDatabase.execSQL(SQL_CREATE_LOCATION_TABLE);
+        Log.i(LOG_TAG, "Table Created : " + SQL_CREATE_LOCATION_TABLE);
         sqLiteDatabase.execSQL(SQL_CREATE_WEATHER_TABLE);
+        Log.i(LOG_TAG, "Table Created : " + SQL_CREATE_WEATHER_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        Log.i(LOG_TAG, "On Upgrade dropping tables ");
         sqLiteDatabase.execSQL("drop table if exists " + WeatherContract.LocationEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("drop table if exists " + WeatherContract.WeatherEntry.TABLE_NAME);
         onCreate(sqLiteDatabase);

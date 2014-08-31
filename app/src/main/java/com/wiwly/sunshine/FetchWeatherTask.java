@@ -54,6 +54,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
     @Override
     protected Void doInBackground(String... params) {
 
+
         if(params.length == 0){
             return null;
         }
@@ -66,7 +67,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
         String format = "json";
         String units = "metric";
-        int days = 14;
+        int numDays = 14;
 
         try {
             final String FORECAST_BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
@@ -79,7 +80,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                     .appendQueryParameter(QUERY_PARAM, locationQuery)
                     .appendQueryParameter(FORMAT_PARAM, format)
                     .appendQueryParameter(UNITS_PARAM, units)
-                    .appendQueryParameter(DAYS_PARAM, Integer.toString(days))
+                    .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                     .build();
 
             URL url = new URL(uri.toString());
@@ -127,6 +128,33 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 }
             }
         }
+
+        try {
+
+            // Location Info
+            final String OWM_CITY = "city";
+            final String OWM_CITY_NAME = "name";
+            final String OWM_COORD = "coord";
+
+            // Location coordinate
+            final String OWM_LATITUDE = "lat";
+            final String OWM_LONGITUDE = "lon";
+
+            final String OWM_LIST = "list";
+
+            JSONObject forecastJson = new JSONObject(forecastJsonStr);
+            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
+
+            JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
+            String cityName = cityJson.getString(OWM_CITY_NAME);
+            JSONObject cityCoordJson = forecastJson.getJSONObject(OWM_CITY);
+            double cityLatitude = cityCoordJson.getDouble(OWM_LATITUDE);
+            double cityLongitude = cityCoordJson.getDouble(OWM_LONGITUDE);
+
+            addLocation("", cityName, cityLatitude, cityLongitude);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
@@ -154,12 +182,12 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 PreferenceManager.getDefaultSharedPreferences(mContext);
         String unitType = sharedPrefs.getString(
                 mContext.getString(R.string.pref_units_key),
-                mContext.getString(R.string.pref_units_metrics));
+                mContext.getString(R.string.pref_units_metric));
 
         if (unitType.equals(mContext.getString(R.string.pref_units_imperial))) {
             high = (high * 1.8) + 32;
             low = (low * 1.8) + 32;
-        } else if (!unitType.equals(mContext.getString(R.string.pref_units_metrics))) {
+        } else if (!unitType.equals(mContext.getString(R.string.pref_units_metric))) {
             Log.d(LOG_TAG, "Unit type not found: " + unitType);
         }
 
@@ -178,57 +206,101 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
      * Fortunately parsing is easy:  constructor takes the JSON string and converts it
      * into an Object hierarchy for us.
      */
-    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays){
-        // These are the names of the JSON objects that need to be extracted.
-        final String OWM_LIST = "list";
-        final String OWM_WEATHER = "weather";
-        final String OWM_TEMPERATURE = "temp";
-        final String OWM_MAX = "max";
-        final String OWM_MIN = "min";
-        final String OWM_DATETIME = "dt";
-        final String OWM_DESCRIPTION = "main";
-
-        String[] resultStrs = new String[0];
-        try {
-            JSONObject forecastJson = new JSONObject(forecastJsonStr);
-            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
-
-            //JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
-
-            resultStrs = new String[numDays];
-            for(int i = 0; i < weatherArray.length(); i++) {
-                // For now, using the format "Day, description, hi/low"
-                String day;
-                String description;
-                String highAndLow;
-
-                // Get the JSON object representing the day
-                JSONObject dayForecast = weatherArray.getJSONObject(i);
-
-                // The date/time is returned as a long.  We need to convert that
-                // into something human-readable, since most people won't read "1400356800" as
-                // "this saturday".
-                long dateTime = dayForecast.getLong(OWM_DATETIME);
-                day = getReadableDateString(dateTime);
-
-                // description is in a child array called "weather", which is 1 element long.
-                JSONObject weatherObject = dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
-                description = weatherObject.getString(OWM_DESCRIPTION);
-
-                // Temperatures are in a child object called "temp".  Try not to name variables
-                // "temp" when working with temperature.  It confuses everybody.
-                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
-                double high = temperatureObject.getDouble(OWM_MAX);
-                double low = temperatureObject.getDouble(OWM_MIN);
-
-                highAndLow = formatHighLows(high, low);
-                resultStrs[i] = day + " - " + description + " - " + highAndLow;
-            }
-        } catch (JSONException e) {
-            Log.e(LOG_TAG, e.getMessage());
-        }
-        return resultStrs;
-    }
+//    private String[] getWeatherDataFromJson(String forecastJsonStr, int numDays){
+//        // These are the names of the JSON objects that need to be extracted.
+//        final String OWM_LIST = "list";
+//        final String OWM_WEATHER = "weather";
+//        final String OWM_TEMPERATURE = "temp";
+//        final String OWM_MAX = "max";
+//        final String OWM_MIN = "min";
+//        final String OWM_DATETIME = "dt";
+//        final String OWM_DESCRIPTION = "main";
+//
+//        //String[] resultStrs = new String[0];
+//        try {
+//            JSONObject forecastJson = new JSONObject(forecastJsonStr);
+//            JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
+//
+//            // Get and insert the new weather information into the database
+//            Vector<ContentValues> cVVector = new Vector<ContentValues>(weatherArray.length());
+//
+//            String[] resultStrs = new String[numDays];
+//
+//            for(int i = 0; i < weatherArray.length(); i++) {
+//                // These are the values that will be collected.
+//
+//                long dateTime;
+//                double pressure;
+//                int humidity;
+//                double windSpeed;
+//                double windDirection;
+//
+//                double high;
+//                double low;
+//
+//                String description;
+//                int weatherId;
+//
+//                // Get the JSON object representing the day
+//                JSONObject dayForecast = weatherArray.getJSONObject(i);
+//
+//                // The date/time is returned as a long.  We need to convert that
+//                // into something human-readable, since most people won't read "1400356800" as
+//                // "this saturday".
+//                dateTime = dayForecast.getLong(OWM_DATETIME);
+//
+//                pressure = dayForecast.getDouble(OWM_PRESSURE);
+//                humidity = dayForecast.getInt(OWM_HUMIDITY);
+//                windSpeed = dayForecast.getDouble(OWM_WINDSPEED);
+//                windDirection = dayForecast.getDouble(OWM_WIND_DIRECTION);
+//
+//                // Description is in a child array called "weather", which is 1 element long.
+//                // That element also contains a weather code.
+//                JSONObject weatherObject =
+//                        dayForecast.getJSONArray(OWM_WEATHER).getJSONObject(0);
+//                description = weatherObject.getString(OWM_DESCRIPTION);
+//                weatherId = weatherObject.getInt(OWM_WEATHER_ID);
+//
+//                // Temperatures are in a child object called "temp".  Try not to name variables
+//                // "temp" when working with temperature.  It confuses everybody.
+//                JSONObject temperatureObject = dayForecast.getJSONObject(OWM_TEMPERATURE);
+//                high = temperatureObject.getDouble(OWM_MAX);
+//                low = temperatureObject.getDouble(OWM_MIN);
+//
+//                ContentValues weatherValues = new ContentValues();
+//
+//                weatherValues.put(WeatherEntry.COLUMN_LOC_KEY, locationID);
+//                weatherValues.put(WeatherEntry.COLUMN_DATETEXT,
+//                        WeatherContract.getDbDateString(new Date(dateTime * 1000L)));
+//                weatherValues.put(WeatherEntry.COLUMN_HUMIDITY, humidity);
+//                weatherValues.put(WeatherEntry.COLUMN_PRESSURE, pressure);
+//                weatherValues.put(WeatherEntry.COLUMN_WIND_SPEED, windSpeed);
+//                weatherValues.put(WeatherEntry.COLUMN_DEGREES, windDirection);
+//                weatherValues.put(WeatherEntry.COLUMN_MAX_TEMP, high);
+//                weatherValues.put(WeatherEntry.COLUMN_MIN_TEMP, low);
+//                weatherValues.put(WeatherEntry.COLUMN_SHORT_DESC, description);
+//                weatherValues.put(WeatherEntry.COLUMN_WEATHER_ID, weatherId);
+//
+//                cVVector.add(weatherValues);
+//
+//                if (cVVector.size() > 0) {
+//                    ContentValues[] cvArray = new ContentValues[cVVector.size()];
+//                    cVVector.toArray(cvArray);
+//                    int rowsInserted = mContext.getContentResolver()
+//                            .bulkInsert(WeatherEntry.CONTENT_URI, cvArray);
+//                    Log.v(LOG_TAG, "inserted " + rowsInserted + " rows of weather data");
+//                }
+//                String highAndLow = formatHighLows(high, low);
+//                String day = getReadableDateString(dateTime);
+//                resultStrs[i] = day + " - " + description + " - " + highAndLow;
+//            }
+//            return resultStrs;
+//        } catch (JSONException e) {
+//            Log.e(LOG_TAG, e.getMessage());
+//        }
+//
+//        return resultStrs;
+//    }
 
     private long addLocation(String locationSetting, String cityName, double lat, double lon){
         Cursor cursor = mContext.getContentResolver().query(
