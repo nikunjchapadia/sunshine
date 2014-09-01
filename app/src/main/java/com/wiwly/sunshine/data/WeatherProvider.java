@@ -101,7 +101,7 @@ public class WeatherProvider extends ContentProvider {
             }
             case WEATHER: {
                 cursor= mOpenHelper.getReadableDatabase().query(
-                        WeatherContract.WeatherEntry.TABLE_NAME,
+                        WeatherEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -112,16 +112,16 @@ public class WeatherProvider extends ContentProvider {
             }
             case LOCATION_ID: {
                 cursor = mOpenHelper.getReadableDatabase().query(
-                        WeatherContract.LocationEntry.TABLE_NAME,
+                        LocationEntry.TABLE_NAME,
                         projection,
-                        WeatherContract.LocationEntry._ID + " = " + ContentUris.parseId(uri),
+                        LocationEntry._ID + " = " + ContentUris.parseId(uri),
                         selectionArgs,
                         null,null,sortOrder);
                 break;
             }
             case LOCATION: {
                 cursor = mOpenHelper.getReadableDatabase().query(
-                        WeatherContract.LocationEntry.TABLE_NAME,
+                        LocationEntry.TABLE_NAME,
                         projection,
                         selection,
                         selectionArgs,
@@ -140,15 +140,15 @@ public class WeatherProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case WEATHER_WITH_LOCATION_AND_DATE:
-                return WeatherContract.WeatherEntry.CONTENT_ITEM_TYPE;
+                return WeatherEntry.CONTENT_ITEM_TYPE;
             case WEATHER_WITH_LOCATION:
-                return WeatherContract.WeatherEntry.CONTENT_TYPE;
+                return WeatherEntry.CONTENT_TYPE;
             case WEATHER:
-                return WeatherContract.WeatherEntry.CONTENT_TYPE;
+                return WeatherEntry.CONTENT_TYPE;
             case LOCATION_ID:
-                return WeatherContract.LocationEntry.CONTENT_ITEM_TYPE;
+                return LocationEntry.CONTENT_ITEM_TYPE;
             case LOCATION:
-                return WeatherContract.WeatherEntry.CONTENT_TYPE;
+                return WeatherEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri : " + uri);
         }

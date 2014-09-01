@@ -11,7 +11,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.ArrayAdapter;
 
-import com.wiwly.sunshine.data.WeatherContract;
+import com.wiwly.sunshine.data.WeatherContract.LocationEntry;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -304,23 +304,23 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
     private long addLocation(String locationSetting, String cityName, double lat, double lon){
         Cursor cursor = mContext.getContentResolver().query(
-                WeatherContract.LocationEntry.CONTENT_URI,
-                new String[]{WeatherContract.LocationEntry._ID},
-                WeatherContract.LocationEntry.LOCATION_SETTING + " = ?",
+                LocationEntry.CONTENT_URI,
+                new String[]{LocationEntry._ID},
+                LocationEntry.LOCATION_SETTING + " = ?",
                 new String[]{locationSetting},
                 null);
         if(cursor.moveToFirst()){
-            int locationIdIndex = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            int locationIdIndex = cursor.getColumnIndex(LocationEntry._ID);
             Log.d(LOG_TAG, "Adding Location :- Location Index " + locationIdIndex);
             Log.d(LOG_TAG, "Adding Location :- Cursor " + cursor.getLong(locationIdIndex));
             return cursor.getLong(locationIdIndex);
         }else {
             ContentValues values = new ContentValues();
-            values.put(WeatherContract.LocationEntry.LOCATION_SETTING, locationSetting);
-            values.put(WeatherContract.LocationEntry.COLUMN_CITY_NAME, cityName);
-            values.put(WeatherContract.LocationEntry.COLUMN_COORD_LAT, lat);
-            values.put(WeatherContract.LocationEntry.COLUMN_COORD_LONG, lon);
-            Uri locIntUri = mContext.getContentResolver().insert(WeatherContract.LocationEntry.CONTENT_URI, values);
+            values.put(LocationEntry.LOCATION_SETTING, locationSetting);
+            values.put(LocationEntry.COLUMN_CITY_NAME, cityName);
+            values.put(LocationEntry.COLUMN_COORD_LAT, lat);
+            values.put(LocationEntry.COLUMN_COORD_LONG, lon);
+            Uri locIntUri = mContext.getContentResolver().insert(LocationEntry.CONTENT_URI, values);
             long rowId = ContentUris.parseId(locIntUri);
             return rowId;
         }
