@@ -53,8 +53,6 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
 
     @Override
     protected Void doInBackground(String... params) {
-
-
         if(params.length == 0){
             return null;
         }
@@ -148,11 +146,13 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             JSONObject cityJson = forecastJson.getJSONObject(OWM_CITY);
             String cityName = cityJson.getString(OWM_CITY_NAME);
             JSONObject cityCoordJson = forecastJson.getJSONObject(OWM_CITY);
-            double cityLatitude = cityCoordJson.getDouble(OWM_LATITUDE);
-            double cityLongitude = cityCoordJson.getDouble(OWM_LONGITUDE);
+            JSONObject coordJson = cityCoordJson.getJSONObject("coord");
+            double cityLatitude = coordJson.getDouble(OWM_LATITUDE);
+            double cityLongitude = coordJson.getDouble(OWM_LONGITUDE);
 
-            addLocation("", cityName, cityLatitude, cityLongitude);
+            addLocation(locationQuery, cityName, cityLatitude, cityLongitude);
         } catch (JSONException e) {
+            Log.e(LOG_TAG, e.getMessage(), e);
             e.printStackTrace();
         }
         return null;
@@ -311,6 +311,8 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
                 null);
         if(cursor.moveToFirst()){
             int locationIdIndex = cursor.getColumnIndex(WeatherContract.LocationEntry._ID);
+            Log.d(LOG_TAG, "Adding Location :- Location Index " + locationIdIndex);
+            Log.d(LOG_TAG, "Adding Location :- Cursor " + cursor.getLong(locationIdIndex));
             return cursor.getLong(locationIdIndex);
         }else {
             ContentValues values = new ContentValues();
