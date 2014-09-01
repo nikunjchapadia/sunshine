@@ -33,8 +33,8 @@ public class WeatherProvider extends ContentProvider {
     static {
         sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
         sWeatherByLocationSettingQueryBuilder.setTables(
-                WeatherEntry.TABLE_NAME + " inner join " +
-                        LocationEntry.TABLE_NAME + "inner join " +
+                WeatherEntry.TABLE_NAME + " join " +
+                        LocationEntry.TABLE_NAME +
                         " on " + WeatherEntry.TABLE_NAME +
                         "." + WeatherEntry.COLUMN_LOC_KEY +
                         " = " + LocationEntry.TABLE_NAME +
