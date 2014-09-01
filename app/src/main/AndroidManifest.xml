@@ -39,6 +39,19 @@
         <provider
             android:authorities="com.wiwly.sunshine"
             android:name=".data.WeatherProvider" />
+
+        <!--Share your app data with other apps-->
+        <!--<provider android:name=".MyContentProvider"-->
+            <!--android:authorities="com.wiwly.sunshine.myauthorities"-->
+            <!--android:enabled="true"-->
+            <!--android:exported="true">-->
+        <!--</provider>-->
+
+        <!--<permission android:name="com.wiwly.sunshine.LICENCE_TO_KILL"-->
+            <!--android:protectionLevel="dangarous"-->
+            <!--android:label="Licence to kill">-->
+        <!--</permission>-->
+
     </application>
 
 </manifest>
