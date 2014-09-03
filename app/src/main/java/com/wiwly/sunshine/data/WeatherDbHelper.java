@@ -18,7 +18,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
     public static final String LOG_TAG = WeatherDbHelper.class.getSimpleName();
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 5;
     public static final String DATABASE_NAME = "weather.db";
 
     public WeatherDbHelper(Context context) {
