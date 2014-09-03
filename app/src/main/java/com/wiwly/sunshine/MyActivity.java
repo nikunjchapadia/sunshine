@@ -46,7 +46,6 @@ public class MyActivity extends ActionBarActivity {
             openPreferredLocationInMap();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 

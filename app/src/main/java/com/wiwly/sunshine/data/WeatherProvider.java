@@ -33,9 +33,9 @@ public class WeatherProvider extends ContentProvider {
     static {
         sWeatherByLocationSettingQueryBuilder = new SQLiteQueryBuilder();
         sWeatherByLocationSettingQueryBuilder.setTables(
-                WeatherEntry.TABLE_NAME + " join " +
+                WeatherEntry.TABLE_NAME + " INNER JOIN " +
                         LocationEntry.TABLE_NAME +
-                        " on " + WeatherEntry.TABLE_NAME +
+                        " ON " + WeatherEntry.TABLE_NAME +
                         "." + WeatherEntry.COLUMN_LOC_KEY +
                         " = " + LocationEntry.TABLE_NAME +
                         "." + LocationEntry._ID);
@@ -100,7 +100,7 @@ public class WeatherProvider extends ContentProvider {
                 break;
             }
             case WEATHER: {
-                cursor= mOpenHelper.getReadableDatabase().query(
+                cursor = mOpenHelper.getReadableDatabase().query(
                         WeatherEntry.TABLE_NAME,
                         projection,
                         selection,
@@ -256,12 +256,15 @@ public class WeatherProvider extends ContentProvider {
                 try {
                     for(ContentValues value : values){
                         long _id = db.insert(WeatherEntry.TABLE_NAME, null, value);
-                        if (_id != -1) returnCount++;
+                        if (_id != -1) {
+                            returnCount++;
+                        }
                     }
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
                 }
+                Log.d(LOG_TAG, "Bulk Insert : " + returnCount);
                 getContext().getContentResolver().notifyChange(uri, null);
             }
             case LOCATION :{

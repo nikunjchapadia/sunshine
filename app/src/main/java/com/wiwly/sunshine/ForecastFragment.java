@@ -32,15 +32,12 @@ import java.util.Date;
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
 
+    public static final String LOG_TAG = ForecastFragment.class.getName();
+
     private static final int FORECAST_LOADER = 0;
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
-    }
-
     private String mLocation;
+    private SimpleCursorAdapter mForecastAdapter;
 
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -68,9 +65,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_MIN_TEMP = 4;
     public static final int COL_LOCATION_SETTING = 5;
 
-    private SimpleCursorAdapter mForecastAdapter;
+
 
     public ForecastFragment() {
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
     }
 
     @Override
@@ -109,8 +112,18 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                 getActivity(),
                 R.layout.list_item_forcast,
                 null,
-                new String[]{WeatherEntry.COLUMN_DATETEXT,WeatherEntry.COLUMN_SHORT_DESC, WeatherEntry.COLUMN_MAX_TEMP, WeatherEntry.COLUMN_MIN_TEMP},
-                new int[]{R.id.list_item_date_text_view, R.id.list_item_forecast_text_view,R.id.list_item_high_text_view,R.id.list_item_low_text_view},
+                new String[]{
+                        WeatherEntry.COLUMN_DATETEXT,
+                        WeatherEntry.COLUMN_SHORT_DESC,
+                        WeatherEntry.COLUMN_MAX_TEMP,
+                        WeatherEntry.COLUMN_MIN_TEMP
+                },
+                new int[]{
+                        R.id.list_item_date_text_view,
+                        R.id.list_item_forecast_text_view,
+                        R.id.list_item_high_text_view,
+                        R.id.list_item_low_text_view
+                },
                 0);
 
         mForecastAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {

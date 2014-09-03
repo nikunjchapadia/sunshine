@@ -65,7 +65,7 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
     public boolean mBindingPreference = true;
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {
-        String stringValue = value.toString();
+
 
 //        if (preference instanceof ListPreference) {
 //            // For list preferences, look up the correct display value in
