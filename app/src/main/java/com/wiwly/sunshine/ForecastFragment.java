@@ -131,7 +131,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
                 boolean isMetric = Utility.isMetric(getActivity());
                 switch (columnIndex) {
-                    case COL_WEATHER_MAX_TEMP:
+                    case COL_WEATHER_MAX_TEMP:{
+
+                    }
                     case COL_WEATHER_MIN_TEMP: {
                         // we have to do some formatting and possibly a conversion
                         ((TextView) view).setText(Utility.formatTemperature(
@@ -141,7 +143,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                     case COL_WEATHER_DATE: {
                         String dateString = cursor.getString(columnIndex);
                         TextView dateView = (TextView) view;
-                        dateView.setText(Utility.formatDate(dateString));
+                        String date = Utility.formatDate(dateString);
+                        dateView.setText(date);
                         return true;
                     }
                 }

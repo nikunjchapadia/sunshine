@@ -130,7 +130,7 @@ public class FetchWeatherTask extends AsyncTask<String, Void, Void> {
             }
         }
         try {
-             getWeatherDataFromJson(forecastJsonStr,numDays, locationQuery);
+            getWeatherDataFromJson(forecastJsonStr, numDays, locationQuery);
         } catch (JSONException e) {
             Log.e(LOG_TAG, e.getMessage(), e);
             return null;

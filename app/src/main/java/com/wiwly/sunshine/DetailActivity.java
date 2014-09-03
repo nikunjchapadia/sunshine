@@ -201,7 +201,7 @@ public class DetailActivity extends ActionBarActivity {
             TextView highView = (TextView) getView().findViewById(R.id.detail_high_text_view);
             TextView lowView = (TextView) getView().findViewById(R.id.detail_low_text_view);
 
-            dateView.setText(Utility.formatDate(dateText));
+            dateView.setText(dateText);
             forecastView.setText(description);
             highView.setText(Utility.formatTemperature(high, isMetric) + "\u00B0");
             lowView.setText(Utility.formatTemperature(low, isMetric) + "\u00B0");

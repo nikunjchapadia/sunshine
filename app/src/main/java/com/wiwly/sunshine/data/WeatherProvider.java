@@ -284,7 +284,9 @@ public class WeatherProvider extends ContentProvider {
                 try {
                     for(ContentValues value : values){
                         long _id = db.insert(LocationEntry.TABLE_NAME, null, value);
-                        if (_id != -1) returnCount++;
+                        if (_id != -1) {
+                            returnCount++;
+                        }
                     }
                     db.setTransactionSuccessful();
                 } finally {

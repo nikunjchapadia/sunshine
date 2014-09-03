@@ -74,8 +74,8 @@ public class WeatherContract {
         public static final String COLUMN_SHORT_DESC = "short_desc";
 
         // Min and max temperatures for the day (stored as floats)
-        public static final String COLUMN_MIN_TEMP = "min";
-        public static final String COLUMN_MAX_TEMP = "max";
+        public static final String COLUMN_MIN_TEMP = "low";
+        public static final String COLUMN_MAX_TEMP = "high";
 
         // Humidity is stored as a float representing percentage
         public static final String COLUMN_HUMIDITY = "humidity";
