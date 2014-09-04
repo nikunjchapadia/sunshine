@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.widget.SimpleCursorAdapter;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,7 +18,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.wiwly.sunshine.data.WeatherContract;
 import com.wiwly.sunshine.data.WeatherContract.LocationEntry;
@@ -37,7 +35,8 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int FORECAST_LOADER = 0;
 
     private String mLocation;
-    private SimpleCursorAdapter mForecastAdapter;
+    //private SimpleCursorAdapter mForecastAdapter;
+    private ForecastAdapter mForecastAdapter;
 
     // For the forecast view we're showing only a small subset of the stored data.
     // Specify the columns we need.
@@ -108,57 +107,61 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my, container, false);
-        mForecastAdapter = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.list_item_forcast,
-                null,
-                new String[]{
-                        WeatherEntry.COLUMN_DATETEXT,
-                        WeatherEntry.COLUMN_SHORT_DESC,
-                        WeatherEntry.COLUMN_MAX_TEMP,
-                        WeatherEntry.COLUMN_MIN_TEMP
-                },
-                new int[]{
-                        R.id.list_item_date_text_view,
-                        R.id.list_item_forecast_text_view,
-                        R.id.list_item_high_text_view,
-                        R.id.list_item_low_text_view
-                },
-                0);
-
-        mForecastAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
-            @Override
-            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
-                boolean isMetric = Utility.isMetric(getActivity());
-                switch (columnIndex) {
-                    case COL_WEATHER_MAX_TEMP:{
-
-                    }
-                    case COL_WEATHER_MIN_TEMP: {
-                        // we have to do some formatting and possibly a conversion
-                        ((TextView) view).setText(Utility.formatTemperature(
-                                cursor.getDouble(columnIndex), isMetric));
-                        return true;
-                    }
-                    case COL_WEATHER_DATE: {
-                        String dateString = cursor.getString(columnIndex);
-                        TextView dateView = (TextView) view;
-                        String date = Utility.formatDate(dateString);
-                        dateView.setText(date);
-                        return true;
-                    }
-                }
-                return false;
-            }
-        });
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        mForecastAdapter = new ForecastAdapter(getActivity(),null,0);
         listView.setAdapter(mForecastAdapter);
+//        mForecastAdapter = new SimpleCursorAdapter(
+//                getActivity(),
+//                R.layout.list_item_forcast,
+//                null,
+//                new String[]{
+//                        WeatherEntry.COLUMN_DATETEXT,
+//                        WeatherEntry.COLUMN_SHORT_DESC,
+//                        WeatherEntry.COLUMN_MAX_TEMP,
+//                        WeatherEntry.COLUMN_MIN_TEMP
+//                },
+//                new int[]{
+//                        R.id.list_item_date_text_view,
+//                        R.id.list_item_forecast_text_view,
+//                        R.id.list_item_high_text_view,
+//                        R.id.list_item_low_text_view
+//                },
+//                0);
+
+//        mForecastAdapter.setViewBinder(new SimpleCursorAdapter.ViewBinder() {
+//            @Override
+//            public boolean setViewValue(View view, Cursor cursor, int columnIndex) {
+//                boolean isMetric = Utility.isMetric(getActivity());
+//                switch (columnIndex) {
+//                    case COL_WEATHER_MAX_TEMP:{
+//
+//                    }
+//                    case COL_WEATHER_MIN_TEMP: {
+//                        // we have to do some formatting and possibly a conversion
+//                        ((TextView) view).setText(Utility.formatTemperature(
+//                                cursor.getDouble(columnIndex), isMetric));
+//                        return true;
+//                    }
+//                    case COL_WEATHER_DATE: {
+//                        String dateString = cursor.getString(columnIndex);
+//                        TextView dateView = (TextView) view;
+//                        String date = Utility.formatDate(dateString);
+//                        dateView.setText(date);
+//                        return true;
+//                    }
+//                }
+//                return false;
+//            }
+//        });
+//        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+//        listView.setAdapter(mForecastAdapter);
 
         // lets deal with sub view here
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                SimpleCursorAdapter adapter = (SimpleCursorAdapter) parent.getAdapter();
+                //SimpleCursorAdapter adapter = (SimpleCursorAdapter) parent.getAdapter();
+                ForecastAdapter adapter = (ForecastAdapter) parent.getAdapter();
                 Cursor cursor = adapter.getCursor();
                 if(null != cursor && cursor.moveToPosition(position)){
 //                    boolean isMetric = Utility.isMetric(getActivity());
