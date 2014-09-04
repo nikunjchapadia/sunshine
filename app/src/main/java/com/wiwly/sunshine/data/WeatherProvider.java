@@ -156,7 +156,7 @@ public class WeatherProvider extends ContentProvider {
             case LOCATION_ID:
                 return LocationEntry.CONTENT_ITEM_TYPE;
             case LOCATION:
-                return WeatherEntry.CONTENT_TYPE;
+                return LocationEntry.CONTENT_TYPE;
             default:
                 throw new UnsupportedOperationException("Unknown uri : " + uri);
         }
@@ -260,8 +260,10 @@ public class WeatherProvider extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int match = sUriMatcher.match(uri);
+        Log.i(LOG_TAG, "Bulk Insert Match : " + match);
         switch (match){
             case WEATHER :{
+                Log.i(LOG_TAG, "Bulk Insert Weather : " + match);
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -275,10 +277,11 @@ public class WeatherProvider extends ContentProvider {
                 } finally {
                     db.endTransaction();
                 }
-                Log.d(LOG_TAG, "Bulk Insert : " + returnCount);
+                Log.d(LOG_TAG, "Bulk Insert Weather :- Match :" + match + " Count : " + returnCount);
                 getContext().getContentResolver().notifyChange(uri, null);
             }
             case LOCATION :{
+                Log.i(LOG_TAG, "Bulk Insert Location : " + match);
                 db.beginTransaction();
                 int returnCount = 0;
                 try {
@@ -292,9 +295,11 @@ public class WeatherProvider extends ContentProvider {
                 } finally {
                     db.endTransaction();
                 }
+                Log.d(LOG_TAG, "Bulk Insert Location :- Match :" + match + " Count : " + returnCount);
                 getContext().getContentResolver().notifyChange(uri, null);
             }
             default:{
+                Log.d(LOG_TAG, "Bulk Insert Default :" + match);
                 return super.bulkInsert(uri, values);
             }
         }

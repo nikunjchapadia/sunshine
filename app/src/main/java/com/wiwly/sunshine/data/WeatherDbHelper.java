@@ -40,7 +40,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                         " UNIQUE (" + LocationEntry.LOCATION_SETTING + ") ON CONFLICT IGNORE );";
 
         final String SQL_CREATE_WEATHER_TABLE =
-                "CREATE TABLE " + WeatherContract.WeatherEntry.TABLE_NAME + " (" +
+                "CREATE TABLE " + WeatherEntry.TABLE_NAME + " (" +
                 // Why AutoIncrement here, and not above?
                 // Unique keys will be auto-generated in either case.  But for weather
                 // forecasting, it's reasonable to assume the user will want information
