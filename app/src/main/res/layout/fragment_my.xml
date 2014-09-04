@@ -11,6 +11,10 @@
     <ListView
         android:id="@+id/listview_forecast"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        style="@style/ForecastListStyle" />
+
+    <!--We can do this but we have to copy this file and put under layout-xxx folder-->
+    <!--android:choiceMode="singleChoice"  instead style />-->
 
 </FrameLayout>
