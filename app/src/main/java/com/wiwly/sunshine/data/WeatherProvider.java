@@ -260,12 +260,11 @@ public class WeatherProvider extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         int match = sUriMatcher.match(uri);
-        Log.i(LOG_TAG, "Bulk Insert Match : " + match);
+        int returnCount = 0;
         switch (match){
             case WEATHER :{
                 Log.i(LOG_TAG, "Bulk Insert Weather : " + match);
                 db.beginTransaction();
-                int returnCount = 0;
                 try {
                     for(ContentValues value : values){
                         long _id = db.insert(WeatherEntry.TABLE_NAME, null, value);
@@ -279,11 +278,11 @@ public class WeatherProvider extends ContentProvider {
                 }
                 Log.d(LOG_TAG, "Bulk Insert Weather :- Match :" + match + " Count : " + returnCount);
                 getContext().getContentResolver().notifyChange(uri, null);
+                break;
             }
             case LOCATION :{
                 Log.i(LOG_TAG, "Bulk Insert Location : " + match);
                 db.beginTransaction();
-                int returnCount = 0;
                 try {
                     for(ContentValues value : values){
                         long _id = db.insert(LocationEntry.TABLE_NAME, null, value);
@@ -297,11 +296,13 @@ public class WeatherProvider extends ContentProvider {
                 }
                 Log.d(LOG_TAG, "Bulk Insert Location :- Match :" + match + " Count : " + returnCount);
                 getContext().getContentResolver().notifyChange(uri, null);
+                break;
             }
             default:{
                 Log.d(LOG_TAG, "Bulk Insert Default :" + match);
                 return super.bulkInsert(uri, values);
             }
         }
+        return 0;
     }
 }
