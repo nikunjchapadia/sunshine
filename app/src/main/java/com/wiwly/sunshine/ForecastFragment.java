@@ -1,7 +1,6 @@
 package com.wiwly.sunshine;
 
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -108,7 +107,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my, container, false);
         ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
-        mForecastAdapter = new ForecastAdapter(getActivity(),null,0);
+        mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
         listView.setAdapter(mForecastAdapter);
 //        mForecastAdapter = new SimpleCursorAdapter(
 //                getActivity(),
@@ -172,9 +171,11 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //                            Utility.formatTemperature(cursor.getDouble(COL_WEATHER_MIN_TEMP), isMetric));
                     //Toast.makeText(getActivity(), forecast, Toast.LENGTH_SHORT).show();
                     //Intent intent = new Intent(getActivity(), DetailActivity.class).putExtra(Intent.EXTRA_TEXT, forecast);
-                    Intent intent = new Intent(getActivity(), DetailActivity.class)
-                            .putExtra(DetailActivity.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
-                    startActivity(intent);
+//                    Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                            .putExtra(DetailFragment.DATE_KEY, cursor.getString(COL_WEATHER_DATE));
+//                    startActivity(intent);
+
+                    ((Callback) getActivity()).onItemSelected(cursor.getString(COL_WEATHER_DATE));
                 }
             }
         });
@@ -236,6 +237,15 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         if (mLocation != null && !mLocation.equals(Utility.getPreferredLocation(getActivity()))) {
             getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
         }
+    }
+
+    /*
+        A callback interface that all activities contains this fragment must implement.
+        This mechanism allows activities to be notified of item selections.
+     */
+    public interface Callback {
+
+        public void onItemSelected(String date);
     }
 
 

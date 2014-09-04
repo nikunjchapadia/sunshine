@@ -11,19 +11,37 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MyActivity extends ActionBarActivity {
+public class MyActivity extends ActionBarActivity implements ForecastFragment.Callback{
 
     private final String LOG_TAG = MyActivity.class.getSimpleName();
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my);
-        if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.container, new ForecastFragment())
-                    .commit();
+
+        // the detail container view will be present only in the large screen layouts
+        // if this view is present , then activity should be in two pane mode
+        if(findViewById(R.id.weather_detail_container) != null){
+            mTwoPane = true;
+            // in two pane mode , show the detail view in this activity by adding or replacing
+            // the detail fragment using fragment transaction
+            if(savedInstanceState == null){
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.weather_detail_container, new DetailFragment())
+                        .commit();
+            }
+        }else {
+            mTwoPane = false;
         }
+
+        // remove this one to add dynamically see above code
+//        if (savedInstanceState == null) {
+//            getSupportFragmentManager().beginTransaction()
+//                    .add(R.id.weather_detail_container, new ForecastFragment())
+//                    .commit();
+//        }
     }
 
     @Override
@@ -64,5 +82,22 @@ public class MyActivity extends ActionBarActivity {
         }
     }
 
+    @Override
+    public void onItemSelected(String date) {
+        if (mTwoPane) {
+            Bundle args = new Bundle();
+            args.putString(DetailFragment.DATE_KEY, date);
+
+            DetailFragment fragment = new DetailFragment();
+            fragment.setArguments(args);
+
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.weather_detail_container, fragment)
+                    .commit();
+        } else {
+            Intent intent = new Intent(this, DetailActivity.class).putExtra(DetailFragment.DATE_KEY, date);
+            startActivity(intent);
+        }
+    }
 }
 

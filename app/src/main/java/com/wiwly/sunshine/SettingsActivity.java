@@ -1,9 +1,13 @@
 package com.wiwly.sunshine;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.support.annotation.Nullable;
 
 import com.wiwly.sunshine.data.WeatherContract;
 
@@ -94,5 +98,16 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         return true;
     }
 
+
+    /**
+     * Add this one so when user change in setting lets say location and back to last list view + detail view
+     * detail view should not disappear
+     * FLAG_ACTIVITY_CLEAR_TOP - this will check if is there any parent activity than use that one rather creating new one
+     */
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public Intent getParentActivityIntent() {
+        return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    }
 }
 
