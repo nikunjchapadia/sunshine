@@ -27,13 +27,16 @@ import java.util.Date;
 /**
  * Created by nikunj on 8/27/14.
  */
-public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     public static final String LOG_TAG = ForecastFragment.class.getName();
-
+    public static final String SELECTED_KEY = "selected";
     private static final int FORECAST_LOADER = 0;
 
     private String mLocation;
+    private int mPosition;
+
+    private ListView mListView;
     //private SimpleCursorAdapter mForecastAdapter;
     private ForecastAdapter mForecastAdapter;
 
@@ -54,6 +57,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
             LocationEntry.LOCATION_SETTING
     };
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mPosition != ListView.INVALID_POSITION) {
+            outState.putInt(SELECTED_KEY, mPosition);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
     // These indices are tied to FORECAST_COLUMNS.  If FORECAST_COLUMNS changes, these
     // must change.
     public static final int COL_WEATHER_ID = 0;
@@ -62,8 +73,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public static final int COL_WEATHER_MAX_TEMP = 3;
     public static final int COL_WEATHER_MIN_TEMP = 4;
     public static final int COL_LOCATION_SETTING = 5;
-
-
 
     public ForecastFragment() {
     }
@@ -106,9 +115,9 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my, container, false);
-        ListView listView = (ListView) rootView.findViewById(R.id.listview_forecast);
+        mListView  = (ListView) rootView.findViewById(R.id.listview_forecast);
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
-        listView.setAdapter(mForecastAdapter);
+        mListView.setAdapter(mForecastAdapter);
 //        mForecastAdapter = new SimpleCursorAdapter(
 //                getActivity(),
 //                R.layout.list_item_forcast,
@@ -156,13 +165,13 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //        listView.setAdapter(mForecastAdapter);
 
         // lets deal with sub view here
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 //SimpleCursorAdapter adapter = (SimpleCursorAdapter) parent.getAdapter();
                 ForecastAdapter adapter = (ForecastAdapter) parent.getAdapter();
                 Cursor cursor = adapter.getCursor();
-                if(null != cursor && cursor.moveToPosition(position)){
+                if (null != cursor && cursor.moveToPosition(position)) {
 //                    boolean isMetric = Utility.isMetric(getActivity());
 //                    String forecast = String.format("%s - %s - %s/%s",
 //                            Utility.formatDate(cursor.getString(COL_WEATHER_DATE)),
@@ -177,14 +186,25 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
                     ((Callback) getActivity()).onItemSelected(cursor.getString(COL_WEATHER_DATE));
                 }
+
+                // when user scroll to the bottom of page and thn go to setting page change something
+                // when comeback screen stay at top , in order to keep at same position we have to get position and then use it
+                mPosition = position;
             }
         });
 
+        // if there is instance state , mine it for useful information
+        // the end goal here is that user never know that turning their device sideways does crazy lifecycle related things ,
+        // it should feel like some stuff stretched out or magically appeared to take advantage of room ,
+        // but data or place in the app was never actually lost
+        if (savedInstanceState != null && savedInstanceState.containsKey(SELECTED_KEY)) {
+            mPosition = savedInstanceState.getInt(SELECTED_KEY);
+        }
         return rootView;
     }
 
     @Override
-    public void onStart(){
+    public void onStart() {
         super.onStart();
         //updateWeather();
     }
@@ -223,6 +243,10 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         mForecastAdapter.swapCursor(cursor);
+        if (mPosition != ListView.INVALID_POSITION) {
+            // if we dont need to restart loader , and there is desired position to restore do this
+            mListView.setSelection(mPosition);
+        }
     }
 
     @Override
