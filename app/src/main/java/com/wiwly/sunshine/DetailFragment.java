@@ -191,8 +191,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
         int weatherId = data.getInt(data.getColumnIndex(WeatherEntry.COLUMN_WEATHER_ID));
 
+
+        String description = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
+        mDescriptionView.setText(description);
+
         //mIconView.setImageResource(R.drawable.ic_launcher);
         mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
+        // useful for talk back accessibility functionality
+        //mIconView.setContentDescription(description);
 
         String date = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_DATETEXT));
         String friendlyDateText = Utility.getDayName(getActivity(), date);
@@ -200,8 +206,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mFriendlyDateView.setText(friendlyDateText);
         mDateView.setText(dateText);
 
-        String description = data.getString(data.getColumnIndex(WeatherEntry.COLUMN_SHORT_DESC));
-        mDescriptionView.setText(description);
 
         boolean isMetric = Utility.isMetric(getActivity());
 
