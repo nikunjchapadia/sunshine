@@ -52,6 +52,10 @@
             <!--android:label="Licence to kill">-->
         <!--</permission>-->
 
+        <service android:name="com.wiwly.sunshine.service.SunshineService"/>
+
+        <receiver android:name=".service.SunshineService$AlarmReceiver" android:enabled="true"/>
+
     </application>
 
 </manifest>

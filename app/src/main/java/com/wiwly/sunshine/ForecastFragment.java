@@ -1,6 +1,7 @@
 package com.wiwly.sunshine;
 
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.widget.ListView;
 import com.wiwly.sunshine.data.WeatherContract;
 import com.wiwly.sunshine.data.WeatherContract.LocationEntry;
 import com.wiwly.sunshine.data.WeatherContract.WeatherEntry;
+import com.wiwly.sunshine.service.SunshineService;
 
 import java.util.Date;
 
@@ -107,9 +109,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
-        String location = Utility.getPreferredLocation(getActivity());
-        weatherTask.execute(location);
+        // old way using async task
+//        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+//        String location = Utility.getPreferredLocation(getActivity());
+//        weatherTask.execute(location);
+
+        Intent intent = new Intent(getActivity(), SunshineService.class);
+        intent.putExtra(SunshineService.LOCATION_QUERY_EXTRA, Utility.getPreferredLocation(getActivity()));
+        getActivity().startActivity(intent);
     }
 
     public void setUseTodayLayout(boolean useTodayLayout){
