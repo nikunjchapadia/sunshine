@@ -35,6 +35,7 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 
     private String mLocation;
     private int mPosition;
+    private boolean mUseTodayLayout;
 
     private ListView mListView;
     //private SimpleCursorAdapter mForecastAdapter;
@@ -111,12 +112,20 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         weatherTask.execute(location);
     }
 
+    public void setUseTodayLayout(boolean useTodayLayout){
+        mUseTodayLayout = useTodayLayout;
+        if(mForecastAdapter != null){
+            mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_my, container, false);
         mListView  = (ListView) rootView.findViewById(R.id.listview_forecast);
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
         mListView.setAdapter(mForecastAdapter);
 //        mForecastAdapter = new SimpleCursorAdapter(
 //                getActivity(),
